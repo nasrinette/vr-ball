@@ -1,5 +1,5 @@
 using UnityEngine;
-// using UnityEngine.InputSystem;
+using UnityEngine.UI;
 using TMPro;
 
 public class PlayerControllerRAB : MonoBehaviour
@@ -15,6 +15,9 @@ public class PlayerControllerRAB : MonoBehaviour
     public GameObject homeUI;
     public GameObject wonUI;
     public GameObject lostUI;
+    public WinEffects winEffects;
+
+    private const int totalPickups = 11;
 
 
 
@@ -23,6 +26,7 @@ public class PlayerControllerRAB : MonoBehaviour
     {
         rb = GetComponent<Rigidbody>();
         count = 0;
+
         SetCountText();
 
         homeUI.SetActive(true);
@@ -46,13 +50,15 @@ public class PlayerControllerRAB : MonoBehaviour
         rb.AddForce(movement * speed);
     }
 
-    void OnTriggerEnter(Collider other) 
+    void OnTriggerEnter(Collider other)
     {
-        if (other.gameObject.CompareTag("PickUp")) 
+        if (other.gameObject.CompareTag("PickUp"))
         {
-            other.gameObject.SetActive(false); // set unactive
+            other.gameObject.SetActive(false);
             count = count+1;
             SetCountText();
+            if (winEffects != null)
+                winEffects.PlayPickup();
         }
     }
 
@@ -67,12 +73,15 @@ public class PlayerControllerRAB : MonoBehaviour
 
     void SetCountText()
     {
-        countText.text = "Count: " + count.ToString();
-        if (count >= 11)
+        string text = count + " / " + totalPickups;
+        countText.text = text;
+        if (count >= totalPickups)
         {
             isPlaying = false;
             wonUI.SetActive(true);
             Destroy(GameObject.FindGameObjectWithTag("Enemy"));
+            if (winEffects != null)
+                winEffects.Play();
         }
     }
 
